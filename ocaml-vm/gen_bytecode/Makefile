@@ -4,7 +4,7 @@ OPT= -without-runtime -no-alias-deps   -no-app-funct \
 	 -no-check-prims   -noassert    -noautolink    -nolabels -nopervasives
 
 all:	tmp
-	ocamlc -I ../stdlib ../stdlib/CustomStdlib.ml \
+	ocamlc -I ../stdlib ../stdlib/customStdlib.ml \
                      ../stdlib/list.ml \
                      ../stdlib/array.ml \
                      ../stdlib/string.ml \
