@@ -1,5 +1,5 @@
 $date
-  Tue Feb 20 12:33:20 2024
+  Tue Feb 20 23:12:25 2024
 $end
 $version
   GHDL v0
@@ -32,23 +32,23 @@ $var reg 1 * rdy[0:0] $end
 $var reg 1 + argument[0:0] $end
 $var reg 2 , result[0:1] $end
 $comment state is not handled $end
-$comment state_var294 is not handled $end
-$comment state_var293 is not handled $end
-$comment state_var292 is not handled $end
-$comment state_var291 is not handled $end
-$comment state_var290 is not handled $end
-$comment state_var289 is not handled $end
-$comment state_var288 is not handled $end
-$comment state_var287 is not handled $end
-$comment state_var286 is not handled $end
-$comment state_var285 is not handled $end
-$comment state_var284 is not handled $end
-$comment state_var283 is not handled $end
-$comment state_var282 is not handled $end
-$comment state_var281 is not handled $end
-$comment state_var280 is not handled $end
-$comment state_var279 is not handled $end
-$comment state_var278 is not handled $end
+$comment state_var246 is not handled $end
+$comment state_var245 is not handled $end
+$comment state_var244 is not handled $end
+$comment state_var243 is not handled $end
+$comment state_var242 is not handled $end
+$comment state_var241 is not handled $end
+$comment state_var240 is not handled $end
+$comment state_var239 is not handled $end
+$comment state_var238 is not handled $end
+$comment state_var237 is not handled $end
+$comment state_var236 is not handled $end
+$comment state_var235 is not handled $end
+$comment state_var234 is not handled $end
+$comment state_var233 is not handled $end
+$comment state_var232 is not handled $end
+$comment state_var231 is not handled $end
+$comment state_var230 is not handled $end
 $comment tab is not handled $end
 $var reg 32 - \$tab_value\[0:31] $end
 $var integer 32 . \$tab_ptr\ $end
