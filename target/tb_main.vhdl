@@ -1,9 +1,9 @@
 -- code generated from the following source code:
---   ../adrien/exists.ecl
+--   ../adrien/for_all.ecl
 --
 -- with the following command:
 --
---    ./eclat ../adrien/exists.ecl
+--    ./eclat ../adrien/for_all.ecl
 
 
 library ieee;
