@@ -81,10 +81,10 @@ let counter () =
 let main () =
   let c = counter () in
   exec 
-    print_string "cy:"; print_int c; print_newline ();
     let () = (mapi_2 (fun (i,_) -> (i, 2*i)))<tab2,tab> in
     print_string "cy:"; print_int c; print_newline ();
     (split_8 ())<tab, tab2, tab3>;
+    print_string "cy:"; print_int c; print_newline ();
     let () = (mapi_2 (fun (_,x) -> print_int x; print_string " "; print_newline (); x))<tab2,tab2> in
     let () = (mapi_2 (fun (_,x) -> print_int x; print_string " "; print_newline (); x))<tab3,tab3> in
     ()

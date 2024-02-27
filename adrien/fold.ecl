@@ -75,10 +75,10 @@ let counter () =
 let main () =
   let c = counter () in
   exec 
-    print_string "cy:"; print_int c; print_newline ();
     let () = (mapi_2 (fun (i,_) -> sum(i)))<tab,tab2> in
     print_string "cy:"; print_int c; print_newline ();
     let s = (fold_8 ((fun (init, v) -> init + 1), 0))<tab2> in
+    print_string "cy:"; print_int c; print_newline ();
     print_int s; print_newline ();
     ()
   default ();;

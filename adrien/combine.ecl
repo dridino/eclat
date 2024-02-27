@@ -77,10 +77,10 @@ let print_dlist()<t> =
 let main () =
   let c = counter () in
   exec 
-    print_string "cy:"; print_int c; print_newline ();
     let () = (mapi_2 (fun (i,_) -> i))<tab,tab2> in
     print_string "cy:"; print_int c; print_newline ();
     let () = (combine_8 ())<tab, tab2, tab3> in
+    print_string "cy:"; print_int c; print_newline ();
     (mapi_2 (fun (_, (a, b)) -> print_int a; print_string " "; print_int b; print_newline (); (a, b)))<tab3, tab3>;
     ()
   default ();;
