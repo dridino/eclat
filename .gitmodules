@@ -1,0 +1,3 @@
+[submodule "eclat"]
+	path = eclat
+	url = git@github.com:lsylvestre/eclat.git

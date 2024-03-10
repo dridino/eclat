@@ -15,19 +15,9 @@ let mapi_2(f)<src,dst> =
   loop(0) ;;
 
 let for_all_1(f)<t> =
-  let counter(reset) =
-    let inc(c) = 
-      if reset then 0 else c + 1 
-    in
-    reg inc last 0
-  in
   let rec loop (i) =
     if i >= t.length then true else
-    let update(i) =
-      let c = counter(false) in
-      if c > 20 then
-        false
-      else f (t[i])
+    let update(i) = f (t[i])
     in
     let v1 = update (i) in
     if v1 then loop (i+1)
@@ -36,19 +26,9 @@ let for_all_1(f)<t> =
   loop 0 ;;
 
 let for_all_2(f)<t> =
-  let counter(reset) =
-    let inc(c) = 
-      if reset then 0 else c + 1 
-    in
-    reg inc last 0
-  in
   let rec loop (i) =
     if i >= t.length - 1 then true else
-    let update(i) =
-      let c = counter(false) in
-      if c > 20 then
-        false
-      else f (t[i])
+    let update(i) = f (t[i])
     in
     let v1 = update (i)
     and v2 = update (i+1) in
@@ -58,19 +38,9 @@ let for_all_2(f)<t> =
   loop 0 ;;
   
 let for_all_4(f)<t> =
-  let counter(reset) =
-    let inc(c) = 
-      if reset then 0 else c + 1 
-    in
-    reg inc last 0
-  in
   let rec loop (i) =
     if i >= t.length - 3 then true else
-    let update(i) =
-      let c = counter(false) in
-      if c > 20 then
-        false
-      else f (t[i])
+    let update(i) = f (t[i])
     in
     let v1 = update (i)
     and v2 = update (i+1)
@@ -82,19 +52,9 @@ let for_all_4(f)<t> =
   loop 0 ;;
 
 let for_all_8(f)<t> =
-  let counter(reset) =
-    let inc(c) = 
-      if reset then 0 else c + 1 
-    in
-    reg inc last 0
-  in
   let rec loop (i) =
     if i >= t.length - 7 then true else
-    let update(i) =
-      let c = counter(false) in
-      if c > 20 then
-        false
-      else f (t[i])
+    let update(i) = f (t[i])
     in
     let v1 = update (i)
     and v2 = update (i+1)
@@ -120,7 +80,7 @@ let main () =
     print_string "cy:"; print_int c; print_newline ();
     let () = (mapi_2 (fun (i,_) -> 2*i))<tab,tab> in
     print_string "cy:"; print_int c; print_newline ();
-    let b = (for_all_8 foo)<tab> in
+    let b = (for_all_8 (fun (v) -> v >= 0))<tab> in
     (if b then print_string "true" else print_string "false"); print_newline ();
     ()
   default ();;
