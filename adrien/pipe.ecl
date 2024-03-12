@@ -59,32 +59,26 @@ let not_piped2(f, g, df, dg, src, dst) =
 
 (* Execution time : 910 *)
 let pipe3(f, g, h, df, dg, dh, src, dst) =
-  let () = iteri(f, df, src, inter1)
-  and () = iteri(g, dg, inter1, inter2)
+  let () = pipe2(f, g, df, dg, src, inter2)
   and () = iteri(h, dh, inter2, dst)
-  in () ;;
+  in ();;
   
 (* Execution time : 2691 *)
 let not_piped3(f, g, h, df, dg, dh, src, dst) =
-  let _ = iteri(f, df, src, inter1) in
-  let _ = iteri(g, dg, inter1, inter2) in
+  let _ = not_piped2(f, g, df, dg, src, inter2) in
   let _ = iteri(h, dh, inter2, dst) in
   () ;;
 
 
 (* Execution time : 916 *)
 let pipe4(f, g, h, i, df, dg, dh, di, src, dst) =
-  let () = iteri(f, df, src, inter1)
-  and () = iteri(g, dg, inter1, inter2)
-  and () = iteri(h, dh, inter2, inter3)
+  let () = pipe3(f, g, h, df, dg, dh, src, inter3)
   and () = iteri(i, di, inter3, dst)
   in () ;;
   
 (* Execution time : 3588 *)
 let not_piped4(f, g, h, i, df, dg, dh, di, src, dst) =
-  let _ = iteri(f, df, src, inter1) in
-  let _ = iteri(g, dg, inter1, inter2) in
-  let _ = iteri(h, dh, inter2, inter3) in
+  let _ = not_piped3(f, g, h, df, dg, dh, src, inter3) in
   let _ = iteri(i, di, inter3, dst) in
   () ;;
 
@@ -100,7 +94,7 @@ let main () =
     let h v = if v = 2 then 3 else -4 in
     let i v = if v = 3 then 4 else -5 in
     print_string "start : "; print_int c; print_newline ();
-    let () = not_piped4(f, g, h, i, -1, -1,  -1, -1, t1, t2) in
+    let () = not_piped4(f, g, h, i, -1, -1, -1, -1, t1, t2) in
     print_string "end   : "; print_int c; print_newline ();
     let test (v, b) = v = 4 in
     let b = for_all_2 (test, t2) in
