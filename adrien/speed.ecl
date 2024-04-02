@@ -1,27 +1,15 @@
-(* 
+let counter () = 
+  reg (fun c -> c + 1) last 0 ;;
 
-  Un programme qui allume une led si la vitesse (en argument) depasse 50
-  =============================
+let rec wait(n) =
+  if n <= 1 then () else wait(n-1) ;;
 
-        val main : i8 => bool
+let static t = 5^100 ;;
 
-
-   $ cd eclat-compiler
-   $ make
-   $ ./eclat ../adrien/speed.ecl -arg="13;26;45;51;82;62;50"
-
-  (option -arg is used for simulation only and ignored for synthesis)
-
-   $ cd ..
-   $ make simul
-    
-      ~> Then, double-click on the file target/tb.vcd to open it with GtkWave 
-         and add I/Os of the generated hardware to see their evolution
-
-         A screen copy of the tool GTKWave, on this example, 
-         is given in examples/sum.png
-
-*)
-
-let main(speed:int<8>) =
-  speed > 50;;
+let main() =
+  let c = counter () in
+  exec
+    print_string "start : "; print_int c; print_newline ();
+    wait (2);
+    print_string "end : "; print_int c; print_newline ()
+  default () ;;  
