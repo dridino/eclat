@@ -13,12 +13,12 @@ let rec wait_false(n) =
 
 let wait_true_1 _ = wait_true(1) ;;
 let wait_false_1 _ = wait_false(1) ;;
-let wait_true_10 _ = wait_true(10) ;;
-let wait_false_10 _ = wait_false(10) ;;
-let wait_true_50 _ = wait_true(50) ;;
-let wait_false_50 _ = wait_false(50) ;;
 let wait_true_100 _ = wait_true(100) ;;
 let wait_false_100 _ = wait_false(100) ;;
+let wait_true_500 _ = wait_true(500) ;;
+let wait_false_500 _ = wait_false(500) ;;
+let wait_true_1000 _ = wait_true(1000) ;;
+let wait_false_1000 _ = wait_false(1000) ;;
 let static t = 0^256 ;;
 let exists_1(f, t) =
       let rec loop (i) =
@@ -75,4 +75,4 @@ let exists_1(f, t) =
 let main () =
     let c = counter () in
     exec
-print_int c; print_string "_";let _ = exists_1(wait_false_100, t) in ();print_int c; print_newline ();print_int c; print_string "_";let _ = exists_2(wait_false_100, t) in ();print_int c; print_newline ();print_int c; print_string "_";let _ = exists_4(wait_false_100, t) in ();print_int c; print_newline ();print_int c; print_string "_";let _ = exists_8(wait_false_100, t) in ();print_int c; print_newline ();print_string "---"; print_newline (); () default () ;;
+print_int c; print_string "_";let _ = exists_1(wait_false_1000, t) in ();print_int c; print_newline ();print_int c; print_string "_";let _ = exists_2(wait_false_1000, t) in ();print_int c; print_newline ();print_int c; print_string "_";let _ = exists_4(wait_false_1000, t) in ();print_int c; print_newline ();print_int c; print_string "_";let _ = exists_8(wait_false_1000, t) in ();print_int c; print_newline ();print_string "---"; print_newline (); () default () ;;
