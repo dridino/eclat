@@ -6,8 +6,8 @@
     iteri_8     : 1125
 *)
 
-let static src = 0^16 ;;
-let static dst = 0^16 ;;
+let static src = 0^128 ;;
+let static dst = 0^128 ;;
 
 let idx(incr, reset) = reg (fun v -> if reset then 0 else (if incr then v + 1 else v)) last 0 ;;
 
@@ -21,6 +21,10 @@ let iteri_farm(f, t) =
         if i >= n then () else (idx.(0) <- i + 1; let () = f(i, t.(i)) in loop ())
     in
     let () = loop ()
+    and () = loop ()
+    and () = loop ()
+    and () = loop ()
+    and () = loop ()
     and () = loop ()
     and () = loop ()
     and () = loop ()
@@ -54,7 +58,7 @@ let rec wait (n) = if n = 0 then () else wait(n-1) ;;
 let counter() = reg (fun v -> v+1) last 0 ;;
 
 let main () =
-    let rec f (i, v) = if i = 0 then wait(1000) else wait(100) in
+    let rec f (i, v) = if i mod 2 = 0 then wait(1000) else wait(100) in
     let c = counter () in
     exec (
         (* iteri_farm((fun (i, v) -> dst.(i) <- i), src);
@@ -63,9 +67,9 @@ let main () =
         iteri_farm(f, src);
         print_string "c_farm : "; print_int c; print_newline ();
 
-        print_string "c_classic : "; print_int c; print_newline ();
+        (* print_string "c_classic : "; print_int c; print_newline ();
         iteri(f, src);
-        print_string "c_classic : "; print_int c; print_newline ();
+        print_string "c_classic : "; print_int c; print_newline (); *)
         
         print_string "c_8 : "; print_int c; print_newline ();
         iteri_8(f, src);
