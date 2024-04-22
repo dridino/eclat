@@ -13,11 +13,8 @@ let rec wait_false(n) =
 
 let static src = (0, true)^256 ;;
 let static dst = (0, false)^256 ;;
-let rec wait_pipe_1(v) = wait(0); v ;;
-let rec wait_pipe_100(v) = wait(99); v ;;
-let rec wait_pipe_500(v) = wait(499); v ;;
 let rec wait_pipe_1000(v) = wait(999); v ;;
-
+let rec wait_pipe_2000(v) = wait(1999); v ;;
 let iteri(f, d, src, dst)=
   let rec loop (i) =
     if i >= dst.length then ()
@@ -78,4 +75,4 @@ let not_piped2(f, g, src, dst) =
 let main () =
     let c = counter () in
     exec
-print_int c; print_string "_";let _ = not_piped2(wait_pipe_1000, wait_pipe_1000, src, dst) in let _ = init_tabs () in ();print_int c; print_newline ();print_int c; print_string "_";let _ = pipe2(wait_pipe_1000, wait_pipe_1000, 0, 0, src, dst) in let _ = init_tabs () in ();print_int c; print_newline ();print_int c; print_string "_";let _ = not_piped3(wait_pipe_1000, wait_pipe_1000, wait_pipe_1000, src, dst) in let _ = init_tabs () in ();print_int c; print_newline ();print_int c; print_string "_";let _ = pipe3(wait_pipe_1000, wait_pipe_1000, wait_pipe_1000, 0, 0, 0, src, dst) in let _ = init_tabs () in ();print_int c; print_newline ();print_int c; print_string "_";let _ = not_piped4(wait_pipe_1000, wait_pipe_1000, wait_pipe_1000, wait_pipe_1000, src, dst) in let _ = init_tabs () in ();print_int c; print_newline ();print_int c; print_string "_";let _ = pipe4(wait_pipe_1000, wait_pipe_1000, wait_pipe_1000, wait_pipe_1000, 0, 0, 0, 0, src, dst) in let _ = init_tabs () in ();print_int c; print_newline ();print_string "---"; print_newline (); () default () ;;
+print_int c; print_string "_";let _ = not_piped2(wait_pipe_1000, wait_pipe_2000, src, dst) in let _ = init_tabs () in ();print_int c; print_newline ();print_int c; print_string "_";let _ = pipe2(wait_pipe_1000, wait_pipe_2000, 0, 0, src, dst) in let _ = init_tabs () in ();print_int c; print_newline ();print_int c; print_string "_";let _ = not_piped3(wait_pipe_1000, wait_pipe_2000, wait_pipe_1000, src, dst) in let _ = init_tabs () in ();print_int c; print_newline ();print_int c; print_string "_";let _ = pipe3(wait_pipe_1000, wait_pipe_2000, wait_pipe_1000, 0, 0, 0, src, dst) in let _ = init_tabs () in ();print_int c; print_newline ();print_int c; print_string "_";let _ = not_piped4(wait_pipe_1000, wait_pipe_2000, wait_pipe_1000, wait_pipe_2000, src, dst) in let _ = init_tabs () in ();print_int c; print_newline ();print_int c; print_string "_";let _ = pipe4(wait_pipe_1000, wait_pipe_2000, wait_pipe_1000, wait_pipe_2000, 0, 0, 0, 0, src, dst) in let _ = init_tabs () in ();print_int c; print_newline ();print_string "---"; print_newline (); () default () ;;
