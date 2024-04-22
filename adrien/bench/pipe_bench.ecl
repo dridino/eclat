@@ -11,29 +11,21 @@ let rec wait_true(n) =
 let rec wait_false(n) =
     if n <= 1 then false else wait_false(n-1) ;;
 
-let wait_true_1 _ = wait_true(1) ;;
-let wait_false_1 _ = wait_false(1) ;;
-let wait_true_10 _ = wait_true(10) ;;
-let wait_false_10 _ = wait_false(10) ;;
-let wait_true_50 _ = wait_true(50) ;;
-let wait_false_50 _ = wait_false(50) ;;
-let wait_true_100 _ = wait_true(100) ;;
-let wait_false_100 _ = wait_false(100) ;;
-let static src = (0, true)^1024 ;;
-let static dst = (0, false)^1024 ;;
+let static src = (0, true)^256 ;;
+let static dst = (0, false)^256 ;;
 let rec wait_pipe_1(v) = wait(0); v ;;
-let rec wait_pipe_10(v) = wait(9); v ;;
-let rec wait_pipe_50(v) = wait(49); v ;;
 let rec wait_pipe_100(v) = wait(99); v ;;
+let rec wait_pipe_500(v) = wait(499); v ;;
+let rec wait_pipe_1000(v) = wait(999); v ;;
 
 let iteri(f, d, src, dst)=
   let rec loop (i) =
     if i >= dst.length then ()
     else
-      let (v, b) = src[i] in
+      let (v, b) = src.(i) in
       if b then (
-        dst[i] <- (d, false);
-        dst[i] <- (f v, true);
+        dst.(i) <- (d, false);
+        dst.(i) <- (f v, true);
         loop (i+1)
       ) else loop i
   in loop 0 ;;
@@ -54,7 +46,7 @@ let not_piped2(f, g, src, dst) =
     )
   in loop (0) ;;
       let pipe2(f, g, df, dg, src, dst) =
-        let inter1 = (0, false)^1024 in
+        let inter1 = (0, false)^256 in
   let _ = iteri(f, df, src, inter1)
   and _ = iteri(g, dg, inter1, dst)
   in () ;;
@@ -66,7 +58,7 @@ let not_piped2(f, g, src, dst) =
     )
   in loop (0) ;;
       let pipe3(f, g, h, df, dg, dh, src, dst) =
-  let inter2 = (0, false)^1024 in
+  let inter2 = (0, false)^256 in
   let _ = pipe2(f, g, df, dg, src, inter2)
   and _ = iteri(h, dh, inter2, dst)
   in ();;
@@ -78,12 +70,12 @@ let not_piped2(f, g, src, dst) =
     )
   in loop (0) ;;
       let pipe4(f, g, h, i, df, dg, dh, di, src, dst) =
-  let inter3 = (0, false)^1024 in
-  let _ = pipe3(f, g, h, df, dg, dh, src, inter3)
-  and _ = iteri(i, di, inter3, dst)
+  let inter2 = (0, false)^256 in
+  let _ = pipe2(f, g, df, dg, src, inter2)
+  and _ = pipe2(h, i, dh, di, inter2, dst)
   in () ;;
       
 let main () =
     let c = counter () in
     exec
-print_int c; print_string "_";not_piped2(wait_pipe_100, wait_pipe_100, src, dst); init_tabs ();print_int c; print_newline ();print_int c; print_string "_";let _ = pipe2(wait_pipe_100, wait_pipe_100, 0, 0, src, dst) in let _ = init_tabs () in ();print_int c; print_newline ();print_int c; print_string "_";not_piped3(wait_pipe_100, wait_pipe_100, wait_pipe_100, src, dst); init_tabs ();print_int c; print_newline ();print_int c; print_string "_";let _ = pipe3(wait_pipe_100, wait_pipe_100, wait_pipe_100, 0, 0, 0, src, dst) in let _ = init_tabs () in ();print_int c; print_newline ();print_int c; print_string "_";not_piped4(wait_pipe_100, wait_pipe_100, wait_pipe_100, wait_pipe_100, src, dst); init_tabs ();print_int c; print_newline ();print_int c; print_string "_";let _ = pipe4(wait_pipe_100, wait_pipe_100, wait_pipe_100, wait_pipe_100, 0, 0, 0, 0, src, dst) in let _ = init_tabs () in ();print_int c; print_newline ();print_string "---"; print_newline (); () default () ;;
+print_int c; print_string "_";let _ = not_piped2(wait_pipe_1000, wait_pipe_1000, src, dst) in let _ = init_tabs () in ();print_int c; print_newline ();print_int c; print_string "_";let _ = pipe2(wait_pipe_1000, wait_pipe_1000, 0, 0, src, dst) in let _ = init_tabs () in ();print_int c; print_newline ();print_int c; print_string "_";let _ = not_piped3(wait_pipe_1000, wait_pipe_1000, wait_pipe_1000, src, dst) in let _ = init_tabs () in ();print_int c; print_newline ();print_int c; print_string "_";let _ = pipe3(wait_pipe_1000, wait_pipe_1000, wait_pipe_1000, 0, 0, 0, src, dst) in let _ = init_tabs () in ();print_int c; print_newline ();print_int c; print_string "_";let _ = not_piped4(wait_pipe_1000, wait_pipe_1000, wait_pipe_1000, wait_pipe_1000, src, dst) in let _ = init_tabs () in ();print_int c; print_newline ();print_int c; print_string "_";let _ = pipe4(wait_pipe_1000, wait_pipe_1000, wait_pipe_1000, wait_pipe_1000, 0, 0, 0, 0, src, dst) in let _ = init_tabs () in ();print_int c; print_newline ();print_string "---"; print_newline (); () default () ;;
