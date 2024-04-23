@@ -2,14 +2,9 @@ let n = 8 ;;
 let static board1 = 0^64 ;;
 let static board2 = 0^64 ;;
 
-
 let get_idx(c, l) = c*n + l ;;
 
 let coord_from_idx(a) = (a/n, a mod n) ;;
-    (* let rec loop (a, i) =
-        if a >= n then loop(a - n, i+1)
-        else (i, a)
-    in loop(a, 0) ;; *)
 
 let init_board () =
     let rec loop (i) =
