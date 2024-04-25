@@ -102,6 +102,23 @@ let iteri_8(f, t) =
   in
   loop 0 ;;
 
+let iteri_farm(f, t) =
+    let n = t.length in
+    let idx = 0^1 in
+    let rec loop() =
+        let i = idx.(0) in
+        if i >= n then () else (idx.(0) <- i + 1; let () = f(i, t.(i)) in loop ())
+    in
+    let () = loop ()
+    and () = loop ()
+    and () = loop ()
+    and () = loop ()
+    and () = loop ()
+    and () = loop ()
+    and () = loop ()
+    and () = loop ()
+    in idx.(0) <- 0; () ;;
+
 let step_par (first_tab) =
     let loop8 (f) =
         let () = f(0)
@@ -117,24 +134,24 @@ let step_par (first_tab) =
     let rec f0(i, j) = one(i, j, true) in
     let rec f1(i, j) = one(i, j, false) in
     if first_tab then
-        let () = loop8((fun (i) -> f0(i, 0)))
-        and () = loop8((fun (i) -> f0(i, 1)))
-        and () = loop8((fun (i) -> f0(i, 2)))
-        and () = loop8((fun (i) -> f0(i, 3)))
-        and () = loop8((fun (i) -> f0(i, 4)))
-        and () = loop8((fun (i) -> f0(i, 5)))
-        and () = loop8((fun (i) -> f0(i, 6)))
-        and () = loop8((fun (i) -> f0(i, 7)))
+        let () = iteri_farm((fun (i, _) -> f0(i, 0)), c0_0)
+        and () = iteri_farm((fun (i, _) -> f0(i, 1)), c0_0)
+        and () = iteri_farm((fun (i, _) -> f0(i, 2)), c0_0)
+        and () = iteri_farm((fun (i, _) -> f0(i, 3)), c0_0)
+        and () = iteri_farm((fun (i, _) -> f0(i, 4)), c0_0)
+        and () = iteri_farm((fun (i, _) -> f0(i, 5)), c0_0)
+        and () = iteri_farm((fun (i, _) -> f0(i, 6)), c0_0)
+        and () = iteri_farm((fun (i, _) -> f0(i, 7)), c0_0)
         in ()
     else
-        let () = loop8((fun (i) -> f1(i, 0)))
-        and () = loop8((fun (i) -> f1(i, 1)))
-        and () = loop8((fun (i) -> f1(i, 2)))
-        and () = loop8((fun (i) -> f1(i, 3)))
-        and () = loop8((fun (i) -> f1(i, 4)))
-        and () = loop8((fun (i) -> f1(i, 5)))
-        and () = loop8((fun (i) -> f1(i, 6)))
-        and () = loop8((fun (i) -> f1(i, 7)))
+        let () = iteri_farm((fun (i, _) -> f1(i, 0)), c0_0)
+        and () = iteri_farm((fun (i, _) -> f1(i, 1)), c0_0)
+        and () = iteri_farm((fun (i, _) -> f1(i, 2)), c0_0)
+        and () = iteri_farm((fun (i, _) -> f1(i, 3)), c0_0)
+        and () = iteri_farm((fun (i, _) -> f1(i, 4)), c0_0)
+        and () = iteri_farm((fun (i, _) -> f1(i, 5)), c0_0)
+        and () = iteri_farm((fun (i, _) -> f1(i, 6)), c0_0)
+        and () = iteri_farm((fun (i, _) -> f1(i, 7)), c0_0)
         in ()
     ;;
 
