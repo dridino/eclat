@@ -20,36 +20,39 @@ let static c5_1 = 0^8 ;;
 let static c6_1 = 0^8 ;;
 let static c7_1 = 0^8 ;;
 
-let get_value(idx, c) =
-    if c = 0 then c0_0.(idx)
-    else if c = 1 then c1_0.(idx)
-    else if c = 2 then c2_0.(idx)
-    else if c = 3 then c3_0.(idx)
-    else if c = 4 then c4_0.(idx)
-    else if c = 5 then c5_0.(idx)
-    else if c = 6 then c6_0.(idx)
-    else if c = 7 then c7_0.(idx)
+
+let coord_from_idx(a) = (a/n, a mod n) ;;
+
+let rec get_value(idx, c, first_tab) =
+    if c = 0 then if first_tab then c0_0.(idx) else c0_1.(idx)
+    else if c = 1 then if first_tab then c1_0.(idx) else c1_1.(idx)
+    else if c = 2 then if first_tab then c2_0.(idx) else c2_1.(idx)
+    else if c = 3 then if first_tab then c3_0.(idx) else c3_1.(idx)
+    else if c = 4 then if first_tab then c4_0.(idx) else c4_1.(idx)
+    else if c = 5 then if first_tab then c5_0.(idx) else c5_1.(idx)
+    else if c = 6 then if first_tab then c6_0.(idx) else c6_1.(idx)
+    else if c = 7 then if first_tab then c7_0.(idx) else c7_1.(idx)
     else 0 ;;
 
-let put_value(v, idx, c) =
-    if c = 0 then c0_1.(idx) <- v
-    else if c = 1 then c1_1.(idx) <- v
-    else if c = 2 then c2_1.(idx) <- v
-    else if c = 3 then c3_1.(idx) <- v
-    else if c = 4 then c4_1.(idx) <- v
-    else if c = 5 then c5_1.(idx) <- v
-    else if c = 6 then c6_1.(idx) <- v
-    else if c = 7 then c7_1.(idx) <- v ;;
+let rec put_value(v, idx, c, first_tab) =
+    if c = 0 then if first_tab then c0_0.(idx) <- v else c0_1.(idx) <- v
+    else if c = 1 then if first_tab then c1_0.(idx) <- v else c1_1.(idx) <- v
+    else if c = 2 then if first_tab then c2_0.(idx) <- v else c2_1.(idx) <- v
+    else if c = 3 then if first_tab then c3_0.(idx) <- v else c3_1.(idx) <- v
+    else if c = 4 then if first_tab then c4_0.(idx) <- v else c4_1.(idx) <- v
+    else if c = 5 then if first_tab then c5_0.(idx) <- v else c5_1.(idx) <- v
+    else if c = 6 then if first_tab then c6_0.(idx) <- v else c6_1.(idx) <- v
+    else if c = 7 then if first_tab then c7_0.(idx) <- v else c7_1.(idx) <- v ;;
 
 let init_glider () =
-    c1_0.(0) <- 1;
-    c2_0.(1) <- 1;
-    c0_0.(2) <- 1;
+    c0_0.(1) <- 1;
     c1_0.(2) <- 1;
+    c2_0.(0) <- 1;
+    c2_0.(1) <- 1;
     c2_0.(2) <- 1 ;;
 
-let print_board () =
-    let f (i, j) = print_string (if get_value(i, j) <> 0 then " O " else " . ") in
+let rec print_board (first_tab) =
+    let f (i, j) = print_string (if get_value(i, j, first_tab) <> 0 then " O " else " . ") in
     let rec loopj (i, j) =
         if j >= n then () else (f(i, j); loopj (i, j+1))
     in
@@ -58,50 +61,106 @@ let print_board () =
     in
     loopi (0) ;;
 
-let invert () =
-    let rec loop (i) =
-        if i >= n then () else (
-            c0_0.(i) <- c0_1.(i);
-            c1_0.(i) <- c1_1.(i);
-            c2_0.(i) <- c2_1.(i);
-            c3_0.(i) <- c3_1.(i);
-            c4_0.(i) <- c4_1.(i);
-            c5_0.(i) <- c5_1.(i);
-            c6_0.(i) <- c6_1.(i);
-            c7_0.(i) <- c7_1.(i);
-            loop (i+1)
-        )
-    in loop (0) ;;
-
-let step () =
-    let num_neighbours (i, j) =
-        let f (i, j) =
+let rec num_neighbours (i, j, first_tab) =
+        let rec f (i, j) =
             if i >= 0 && i < n then
-                if j >= 0 && j < n then get_value(i, j) else 0
+                if j >= 0 && j < n then get_value(i, j, first_tab) else 0
             else 0
         in
-        f(i-1, j-1) + f(i-1, j) + f(i-1, j+1) + f(i, j-1) + f(i, j+1) + f(i+1, j-1) + f(i+1, j) + f(i+1, j+1)
-    in
-    let f(i, j) =
-        let num_n = num_neighbours(i, j) in
-        let is_alive = get_value(i, j) <> 0 in
+        f(i-1, j-1) + f(i-1, j) + f(i-1, j+1) + f(i, j-1) + f(i, j+1) + f(i+1, j-1) + f(i+1, j) + f(i+1, j+1) ;;
+
+let rec one(i, j, first_tab) =
+        let num_n = num_neighbours(i, j, first_tab) in
+        let is_alive = get_value(i, j, first_tab) <> 0 in
         let v =
             if is_alive then
                 if num_n < 2 or num_n > 3 then 0 else 1
             else
                 if num_n = 3 then 1 else 0
         in
-        put_value(v, i, j)
+        put_value(v, i, j, not(first_tab)) ;;
+
+let step_seq (first_tab) =
+    let rec loop (k) =
+        if k >= n*n then () else let (i, j) = coord_from_idx(k) in (one(i, j, first_tab); loop (k+1))
     in
-    let rec loopj (i, j) =
-        if j >= n then () else (f(i, j); loopj (i, j+1))
+    loop (0) ;;
+
+let iteri_8(f, t) =
+  let rec loop (i) =
+    if i >= n then () else
+    let () = f(i, t.(i))
+    and () = f(i+1, t.(i+1))
+    and () = f(i+2, t.(i+2))
+    and () = f(i+3, t.(i+3))
+    and () = f(i+4, t.(i+4))
+    and () = f(i+5, t.(i+5))
+    and () = f(i+6, t.(i+6))
+    and () = f(i+7, t.(i+7))
     in
-    let rec loopi (i) =
-        if i >= n then () else (loopj (i, 0); loopi (i+1))
+    loop (i+8)
+  in
+  loop 0 ;;
+
+let step_par (first_tab) =
+    let loop8 (f) =
+        let () = f(0)
+        and () = f(1)
+        and () = f(2)
+        and () = f(3)
+        and () = f(4)
+        and () = f(5)
+        and () = f(6)
+        and () = f(7)
+        in ()
     in
-    loopi (0) ;;
+    let rec f0(i, j) = one(i, j, true) in
+    let rec f1(i, j) = one(i, j, false) in
+    if first_tab then
+        let () = loop8((fun (i) -> f0(i, 0)))
+        and () = loop8((fun (i) -> f0(i, 1)))
+        and () = loop8((fun (i) -> f0(i, 2)))
+        and () = loop8((fun (i) -> f0(i, 3)))
+        and () = loop8((fun (i) -> f0(i, 4)))
+        and () = loop8((fun (i) -> f0(i, 5)))
+        and () = loop8((fun (i) -> f0(i, 6)))
+        and () = loop8((fun (i) -> f0(i, 7)))
+        in ()
+    else
+        let () = loop8((fun (i) -> f1(i, 0)))
+        and () = loop8((fun (i) -> f1(i, 1)))
+        and () = loop8((fun (i) -> f1(i, 2)))
+        and () = loop8((fun (i) -> f1(i, 3)))
+        and () = loop8((fun (i) -> f1(i, 4)))
+        and () = loop8((fun (i) -> f1(i, 5)))
+        and () = loop8((fun (i) -> f1(i, 6)))
+        and () = loop8((fun (i) -> f1(i, 7)))
+        in ()
+    ;;
+
+let counter () =
+    reg (fun v -> v + 1) last 0 ;;
+
+(* sans paralleliser : 1709 / step *)
+(* en parallelisant  :  149 / step *)
 
 let main () =
+    let c = counter () in
     exec (
-        step ()
+        init_glider ();
+        print_board (true);
+        print_string "start_seq : "; print_int c; print_newline ();
+        step_par (true);
+        print_string "finish_seq : "; print_int c; print_newline ();
+        
+
+        print_board (false);
+        print_string "start_par : "; print_int c; print_newline ();
+        step_par (false);
+        print_string "finish_par : "; print_int c; print_newline ();
+        print_board (true);
+
+
+        let rec f () = f () in
+        f ()
     ) default () ;;
