@@ -51,6 +51,7 @@ let init_glider () =
     c2_0.(1) <- 1;
     c2_0.(2) <- 1 ;;
 
+(*
 let rec print_board (first_tab) =
     let f (i, j) = print_string (if get_value(i, j, first_tab) <> 0 then " O " else " . ") in
     let rec loopj (i, j) =
@@ -59,7 +60,7 @@ let rec print_board (first_tab) =
     let rec loopi (i) =
         if i >= n then print_newline () else (loopj (i, 0); print_newline (); loopi (i+1))
     in
-    loopi (0) ;;
+    loopi (0) ;; *)
 
 let rec num_neighbours (i, j, first_tab) =
         let rec f (i, j) =
@@ -85,22 +86,6 @@ let step_seq (first_tab) =
         if k >= n*n then () else let (i, j) = coord_from_idx(k) in (one(i, j, first_tab); loop (k+1))
     in
     loop (0) ;;
-
-let iteri_8(f, t) =
-  let rec loop (i) =
-    if i >= n then () else
-    let () = f(i, t.(i))
-    and () = f(i+1, t.(i+1))
-    and () = f(i+2, t.(i+2))
-    and () = f(i+3, t.(i+3))
-    and () = f(i+4, t.(i+4))
-    and () = f(i+5, t.(i+5))
-    and () = f(i+6, t.(i+6))
-    and () = f(i+7, t.(i+7))
-    in
-    loop (i+8)
-  in
-  loop 0 ;;
 
 let step_par (first_tab) =
     let loop8 (f) =
@@ -135,26 +120,31 @@ let step_par (first_tab) =
 let counter () =
     reg (fun v -> v + 1) last 0 ;;
 
+let iteri_8(f, t) =
+  let rec loop (i) =
+    if i >= n then () else
+    let () = f(i, t.(i))
+    and () = f(i+1, t.(i+1))
+    and () = f(i+2, t.(i+2))
+    and () = f(i+3, t.(i+3))
+    and () = f(i+4, t.(i+4))
+    and () = f(i+5, t.(i+5))
+    and () = f(i+6, t.(i+6))
+    and () = f(i+7, t.(i+7))
+    in
+    loop (i+8)
+  in
+  loop 0 ;;
+
 (* sans paralleliser : 1709 / step *)
 (* en parallelisant  :  149 / step *)
-
 let main () =
     let c = counter () in
     exec (
         init_glider ();
-        print_board (true);
-        print_string "start_seq : "; print_int c; print_newline ();
-        step_par (true);
-        print_string "finish_seq : "; print_int c; print_newline ();
-        
+        print_string "start : "; print_int c; print_newline ();
+        step_par(true);
+        print_string "end : "; print_int c; print_newline ();
 
-        print_board (false);
-        print_string "start_par : "; print_int c; print_newline ();
-        step_par (false);
-        print_string "finish_par : "; print_int c; print_newline ();
-        print_board (true);
-
-
-        let rec f () = f () in
-        f ()
+        let rec f() = f () in f ()
     ) default () ;;
