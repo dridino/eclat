@@ -1,0 +1,165 @@
+type box = int<11>*int<11>*int<11>*int<11>*(int<4>*int<4>*int<4>) ;; (* [| x;y;w;h;r;g;b |] *)
+
+let (bg_r,bg_g,bg_b) = (0,0,1) ;;
+
+let ball_color = (-1,0,0) ;;
+let player_color = (-1,-1,-1) ;;
+
+let (player_w,player_h) = (20,100) ;;
+
+let ball_size = 14 ;;
+
+let collision((x1,y1,w1,h1),(x2,y2,w2,h2)) =
+    (x1 <= x2 + w2) && (x1 + w1 >= x2) && (y1 <= y2 + h2) && (y1 + h1 >= y2) ;;
+
+let pll(f : unit => (bool*bool*int<4>*int<4>*int<4>)) =
+    let (_,v) = reg (fun (indic,v) -> if indic then (false,v) else (true, f())) last (true,(true,true,0,0,0)) in v;;
+
+let hvpos() =
+    reg (fun (h,v) -> if h < 799 then (h+1,v) else if v < 525 then (0,v+1) else (0,0)) last (-1,0) ;;
+
+let display(ball,player1,player2) =
+    let (h_offset,v_offset) = (160,45) in
+    let (hpos,vpos) = hvpos() in
+
+    let color_to_draw(i,j) =
+        let (x1,y1,w1,h1,(r1,g1,b1)) = ball in
+        let (x2,y2,w2,h2,(r2,g2,b2)) = player1 in
+        let (x3,y3,w3,h3,(r3,g3,b3)) = player2 in
+        if (vpos >= y1+v_offset && vpos < y1+h1+v_offset && hpos >= x1+h_offset && hpos < x1+w1+h_offset) then
+            (r1,g1,b1)
+        else if (vpos >= y2+v_offset && vpos < y2+h2+v_offset && hpos >= x2+h_offset && hpos < x2+w2+h_offset) then
+            (r2,g2,b2)
+        else if (vpos >= y3+v_offset && vpos < y3+h3+v_offset && hpos >= x3+h_offset && hpos < x3+w3+h_offset) then
+            (r3,g3,b3)
+        else
+            (bg_r,bg_g,bg_b)
+    in
+    let (r,g,b) : (int<4> * int<4> * int<4>) = color_to_draw(hpos,vpos) in
+
+    let hsync = hpos <= 16 or hpos >= 112 in
+    let vsync = vpos <= 10 or vpos >= 12 in
+
+    let (r,g,b) =
+        if ((hpos < h_offset) or (vpos < v_offset)) then
+            (0,0,0)
+        else
+            (r,g,b)
+    in
+    (hsync,vsync,r,g,b) ;;
+
+let move((ball,player1,player2,p1_dy,score) : box * box * box * int<11> * int<4>) : box * box * box * int<4> =
+    let ball_dir = (1,1) in
+    let player_dir = (0,1) in
+
+    let (ball_x,ball_y,ball_w,ball_h,(_,_,_)) = ball in
+    let (player1_x,player1_y,player1_w,player1_h,(_,_,_)) = player1 in
+    let (player2_x,player2_y,player2_w,player2_h,(_,_,_)) = player2 in
+
+    let ball_delta(left_col,right_col,top_col,bot_col,score_delta) =
+        let ((_,_),(dx,dy),_,score) = reg (fun ((old_dx,old_dy),(r_dx,r_dy),cpt,score) ->
+            if cpt = 1000000 then (
+                let dx = if left_col then 1 else (if right_col then -1 else old_dx) in
+                let dy = if top_col then 1 else (if bot_col then -1 else old_dy) in
+                ((dx,dy),(dx,dy),0,score+score_delta)
+            ) else ((old_dx,old_dy),(0,0),cpt+1,score)
+        ) last ((1,1),(0,0),0,0)
+        in (dx,dy,score)
+    in
+    let player1_delta(top_col,bot_col) = let (_,dy,_) = reg (fun (dy,r_dy,cpt) -> if p1_dy = 0 then (dy,0,cpt) else if cpt = 200000 then let dy = (if (top_col && p1_dy < 0) or (bot_col && p1_dy > 0) then 0 else p1_dy) in (dy,dy,0) else (dy,0,cpt+1)) last (0,0,0) in dy in
+    let player2_delta(top_col,bot_col) = let (_,dy,_) = reg (fun (old_dy,r_dy,cpt) ->
+        if cpt = 3000000 then
+            let delta = if ball_y + ball_h / 2 > player2_y + player2_h / 2 then 1 else -1 in
+            let dy = (if (top_col && delta < 0) or (bot_col && delta > 0) then 0 else delta) in
+            (dy,dy,0)
+        else
+            (old_dy,0,cpt+1)
+    ) last (0,0,0) in dy in
+
+    let (ball,score) =
+        let (pot_dx,pot_dy) = ball_dir in
+        let (player_pot_dx,player_pot_dy) = player_dir in
+        let collision_top_wall = ball_y - pot_dy < 0 in
+        let collision_bottom_wall = ball_y + ball_h + pot_dy >= 480 in
+        let collision_left_wall = ball_x - pot_dx < 0 in
+        let collision_right_wall = ball_x + ball_w + pot_dx >= 640 in
+        let collision_player1 = collision((ball_x, ball_y, ball_w,ball_h), (player1_x,player1_y,player1_w,player1_h)) in
+        let collision_player2 = collision((ball_x, ball_y, ball_w,ball_h), (player2_x,player2_y,player2_w,player2_h)) in
+        
+        let left_col = collision_left_wall or ((collision_player1 && ball_x + pot_dx >= player1_x + player1_w) or (collision_player2 && ball_x + pot_dx >= player2_x + player2_w)) in
+        let right_col = collision_right_wall or ((collision_player1 && ball_x+ball_w-pot_dx <= player1_x) or (collision_player2 && ball_x+ball_w-pot_dx <= player2_x)) in
+        let top_col = collision_top_wall or ((collision_player1 && ball_y+pot_dy >= player1_y + player1_h) or (collision_player2 && ball_y+pot_dy >= player2_y + player2_h)) in
+        let bot_col = collision_bottom_wall or ((collision_player1 && ball_y+ball_h-pot_dy <= player1_y) or (collision_player2 && ball_y+ball_h-pot_dy <= player2_y)) in
+        
+        let (dx,dy,score) = ball_delta(left_col,right_col,top_col,bot_col,if collision_right_wall then -1 else if collision_left_wall then 1 else 0) in
+        (ball_x+dx,ball_y+dy,ball_size,ball_size,ball_color),score
+    in
+    let player1 =
+        let (pot_dx,pot_dy) = player_dir in
+        let (ball_pot_dx,ball_pot_dy) = ball_dir in
+        let collision_top_wall = player1_y - pot_dy < 0 in
+        let collision_bottom_wall = player1_y + player1_h + pot_dy >= 480 in
+        let collision_ball = collision((player1_x + pot_dx, player1_y + pot_dy, player1_w,player1_h), (ball_x + ball_pot_dx,ball_y + ball_pot_dy,ball_w,ball_h)) in
+        
+        let top_col = (collision_top_wall or (collision_ball && (ball_y+ball_h-ball_pot_dy <= player1_y+pot_dy))) in (* -v pour deplacement *)
+        let bot_col = (collision_bottom_wall or (collision_ball && (ball_y+ball_pot_dy >= player1_y+player1_h-pot_dy))) in (* +v pour deplacement *)
+        let dy = player1_delta(top_col,bot_col) in
+        (player1_x,player1_y + dy,player_w,player_h,player_color)
+    in
+    let player2 =
+        let (pot_dx,pot_dy) = player_dir in
+        let (ball_pot_dx,ball_pot_dy) = ball_dir in
+        let collision_top_wall = player2_y - pot_dy < 0 in
+        let collision_bottom_wall = player2_y + player2_h + pot_dy >= 480 in
+        let collision_ball = collision((player2_x + pot_dx, player2_y + pot_dy, player2_w,player2_h), (ball_x + ball_pot_dx,ball_y + ball_pot_dy,ball_w,ball_h)) in
+        
+        let top_col = (collision_top_wall or (collision_ball && (ball_y+ball_h-ball_pot_dy <= player2_y+pot_dy))) in (* -v pour deplacement *)
+        let bot_col = (collision_bottom_wall or (collision_ball && (ball_y+ball_pot_dy >= player2_y+player2_h-pot_dy))) in (* +v pour deplacement *)
+        let dy = player2_delta(top_col,bot_col) in
+        (player2_x,player2_y+dy,player_w,player_h,player_color)
+    in
+    
+    (ball,player1,player2,score) ;;
+
+let minus = (true,true,true,true,true,true,false,true) ;;
+
+let none = (true,true,true,true,true,true,true,true) ;;
+
+let map_digit(n: int<4>) =
+    match n with
+    | 0 -> display0
+    | 1 -> display1
+    | 2 -> display2
+    | 3 -> display3
+    | 4 -> display4
+    | 5 -> display5
+    | 6 -> display6
+    | 7 -> display7
+    | 8 -> display8
+    | 9 -> display9
+    | 10 -> displayA
+    | 11 -> displayB
+    | 12 -> displayC
+    | 13 -> displayD
+    | 14 -> displayE
+    | 15 -> displayF
+    | _ -> displayL
+    end ;;
+
+let main(((s0,s1,s2,s3,s4,s5,s6,s7,s8,s9), (k0,k1), gsensor_int, gsensor_sdo, gsensor_sdi) : ((bool*bool*bool*bool*bool*bool*bool*bool*bool*bool) * (bool*bool) * int<2> * std_logic * std_logic)) =
+    let (ball,player1,player2,score) = reg (fun (ball,player1,player2,score) ->
+        let player1_dy = if k0 then if k1 then 0 else 1 else -1 in
+        move(ball,player1,player2, player1_dy,score)
+    ) last (
+        let player1 = (610,190,player_w,player_h,(-1,-1,-1)) in
+        let player2 = (10,190,player_w,player_h,(15,15,15)) in
+        let ball = (313,233,ball_size,ball_size,(-1,0,0)) in (* 313,233 *)
+        (ball,player1,player2,0)
+    ) in
+    
+    let (hsync,vsync,r,g,b) = pll(fun () -> display(ball,player1,player2)) in
+
+    let n = map_digit(if score < 0 then abs(score) else score) in
+    let digs = (n,if score < 0 then minus else none,none,none,none,none) in
+
+    ((s0,s1,s2,s3,s4,s5,s6,s7,s8,s9), digs, ZERO, false, hsync,vsync,r,g,b, ZERO,ZERO) ;;

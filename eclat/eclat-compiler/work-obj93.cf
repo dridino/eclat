@@ -1,0 +1,6 @@
+v 4
+file . "../../adrien/stage/vhdl_externes/test_circ.vhdl" "058c825431fc83e12883e8f268f3ec97a10f3adc" "20240625135110.639":
+  entity test_circ1 at 1( 0) + 0 on 13;
+  architecture rtl of test_circ1 at 13( 289) + 0 on 14;
+  entity test_circ2 at 18( 394) + 0 on 15;
+  architecture rtl of test_circ2 at 30( 683) + 0 on 16;

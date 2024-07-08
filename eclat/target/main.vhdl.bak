@@ -1,0 +1,61 @@
+-- code generated from the following source code:
+--   ../ocaml-vm/vm/target-specific/intel-max10/IOs.ecl
+--   ../../adrien/stage/vhdl_externes/test.ecl
+--
+-- with the following command:
+--
+--    ./eclat ../ocaml-vm/vm/target-specific/intel-max10/IOs.ecl ../../adrien/stage/vhdl_externes/test.ecl
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+use work.runtime.all;
+
+
+entity main is
+  
+  port(signal clk    : in std_logic;
+       signal reset  : in std_logic;
+       signal run    : in std_logic;
+       signal rdy    : out value(0 to 0);
+       signal argument : in value(0 to 15);
+       signal result : out value(0 to 61));
+       
+end entity;
+architecture rtl of main is
+
+  type t_state is (compute35);
+  signal state: t_state;
+  
+  begin
+    process(clk)
+      variable result33 : value(0 to 61) := (others => '0');
+      variable rdy34 : value(0 to 0) := (others => '0');
+      
+    begin
+      
+      if rising_edge(clk) then
+        if (reset = '1') then
+          default_zero(rdy34); default_zero(result33); 
+          rdy <= "1";
+          rdy34 := "0";
+          state <= compute35;
+          
+        else if run = '1' then
+          case state is
+          when compute35 =>
+            rdy34 := eclat_false;
+            result33 := ""&argument(0) & ""&argument(1) & ""&argument(2) & ""&argument(3) & ""&argument(4) & ""&argument(5) & ""&argument(6) & ""&argument(7) & ""&argument(8) & eclat_getBit(X"0000000" & X"0" & X"0000000" & X"0") & "00000011" & "00000011" & "00000011" & "00000011" & "00000011" & "00000011" & "0" & eclat_false & ""&argument(14) & ""&argument(15);
+            rdy34 := eclat_true;
+            state <= compute35;
+          end case;
+          
+          result <= result33;
+          rdy <= rdy34;
+          
+        end if;
+      end if;
+    end if;
+  end process;
+end architecture;

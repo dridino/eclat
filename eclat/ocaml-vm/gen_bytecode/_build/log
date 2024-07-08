@@ -1,0 +1,22 @@
+# dune build
+# OCAMLPARAM: unset
+# Shared cache: disabled
+# Shared cache location: /home/user/.cache/dune/db
+# Workspace root: /home/user/TER/eclat/ocaml-vm/gen_bytecode
+# Auto-detected concurrency: 8
+# Dune context:
+#  { name = "default"
+#  ; kind = "default"
+#  ; profile = Dev
+#  ; merlin = true
+#  ; fdo_target_exe = None
+#  ; build_dir = In_build_dir "default"
+#  ; installed_env =
+#      map
+#        { "INSIDE_DUNE" :
+#            "/home/user/TER/eclat/ocaml-vm/gen_bytecode/_build/default"
+#        }
+#  ; instrument_with = []
+#  }
+$ /home/user/.opam/5.1.0/bin/ocamlc.opt -config > /tmp/dune_c4406c_output
+# Promoting "_build/default/bcprepare.opam" to "bcprepare.opam"
