@@ -76,8 +76,8 @@ let gradient_morph_par(src,dst) =
 
 (* SEQ *)
 let skel_seq((src, dst, es) : (int<2> vector<12> array<12>) * (int<2> vector<12> array<12>) * (int<2>*int<2>*int<2>*int<2>*int<2>*int<2>*int<2>*int<2>*int<2> => int<2>)) =
-    let to_bounds(l,j) =
-        if j >= 0 && j < 12 then vect_nth(l, j)
+    let to_bounds(i,j) =
+        if j >= 0 && j < 12 && i >= 0 && i < 12 then vect_nth(src.(i), j)
         else -1
     in
 
@@ -85,26 +85,22 @@ let skel_seq((src, dst, es) : (int<2> vector<12> array<12>) * (int<2> vector<12>
         if i = 12 then ()
         else (
             let l = vect_create(12,-1) in
-            let l0 = if i < 0 then get(src, i-1) else l in
-            let l1 = get(src, i) in
-            let l2 = if i < 11 then get(src, i+1) else l in
             let f (j,cell) =
                 es(
-                    to_bounds(l0,j-1),
-                    to_bounds(l0,j),
-                    to_bounds(l0,j+1),
+                    to_bounds(i-1,j-1),
+                    to_bounds(i-1,j),
+                    to_bounds(i-1,j+1),
                     
-                    to_bounds(l1,j-1),
-                    to_bounds(l1,j),
-                    to_bounds(l1,j+1),
+                    to_bounds(i,j-1),
+                    to_bounds(i,j),
+                    to_bounds(i,j+1),
                     
-                    to_bounds(l2,j-1),
-                    to_bounds(l2,j),
-                    to_bounds(l2,j+1)
+                    to_bounds(i+1,j-1),
+                    to_bounds(i+1,j),
+                    to_bounds(i+1,j+1)
                 )
             in
             let tmp = vect_mapi(f, l) in
-            print_string "hello";
             set(dst, i, tmp);
             loop(i+1)
         )
@@ -190,7 +186,8 @@ let gradient_morph_seq(src,dst) =
     let dst1 = create(12) in
     (* erosion_seq(src,dst1);  -- v1 *)
     (* dilatation_seq(src,dst);      *)
-    let _ = (erosion_seq(src,dst1) || dilatation_seq(src,dst)) in
+    erosion_seq(src,dst1);
+    dilatation_seq(src,dst);
     let rec loop(i) =
         if i = 12 then ()
         else (
@@ -201,6 +198,98 @@ let gradient_morph_seq(src,dst) =
         )
     in loop(0) ;;
 
+let map (f,src,dst) = 
+  let rec loop(i) =
+    if i >= dst.length then () else
+    (dst.(i) <- f (i,src.(i)); loop(i+1))
+  in loop(0) ;;
+
+let demi_pipe(id,f,src,dst) =
+  let rec loop(i) =
+    if i >= dst.length then () else
+    let (v,b) = src.(i) in
+    if b then ((* print_id(id,i);*)
+         let () = src.(i) <- (v,false)
+         and () = dst.(i) <- f (i,v) in
+         loop(i+1)) else loop(i)
+  in loop(0) ;;
+
+(** val pipe2 : int * (('a -> 'b) * ('b -> 'c)) * 'b * ('a array * 'c array) -> unit *)
+let pipe2 (id,(f1,f2),d,(src,dst)) =
+  let tmp = create(12) in
+  tmp.(0) <- (d,true);
+  tmp.(1) <- (d,true);
+  tmp.(2) <- (d,true);
+  tmp.(3) <- (d,true);
+  tmp.(4) <- (d,true);
+  tmp.(5) <- (d,true);
+  tmp.(6) <- (d,true);
+  tmp.(7) <- (d,true);
+  tmp.(8) <- (d,true);
+  tmp.(9) <- (d,true);
+  tmp.(10) <- (d,true);
+  tmp.(11) <- (d,true);
+  let () = map ((fun (i,v) -> (f1 (i,v),true)),src,tmp)
+  and () = demi_pipe(id,f2,tmp,dst) in
+  () ;;
+
+let gradient_morph_pipe(src,dst) =
+    let es_er(i00,i01,i02,  i10,i11,i12,  i20,i21,i22) =
+        let min(a,b) = if a < b then a else b in
+        let m1 = min(i01,i10) in
+        let m2 = min(m1,i11) in
+        let m3 = min(m2,i12) in
+        let res = min(m3,i21) in
+        if res >= 0 then res else 0
+    in
+    let es_dil(i00,i01,i02,  i10,i11,i12,  i20,i21,i22) =
+        let max(a,b) = if a > b then a else b in
+        let m1 = max(i01,i10) in
+        let m2 = max(m1,i11) in
+        let m3 = max(m2,i12) in
+        max(m3,i21)
+    in
+    let to_bounds(i,j) =
+        if j >= 0 && j < 12 && i >= 0 && i < 12 then vect_nth(src.(i), j)
+        else -1
+    in
+    let f1(i,line) =
+        let f (j,cell) =
+            es_er(
+                to_bounds(i-1,j-1),
+                to_bounds(i-1,j),
+                to_bounds(i-1,j+1),
+                
+                to_bounds(i,j-1),
+                cell,
+                to_bounds(i,j+1),
+                
+                to_bounds(i+1,j-1),
+                to_bounds(i+1,j),
+                to_bounds(i+1,j+1)
+            )
+        in
+        vect_mapi(f, line)
+    in
+    let f2(i,line) =
+        let f (j,cell) =
+            es_dil(
+                to_bounds(i-1,j-1),
+                to_bounds(i-1,j),
+                to_bounds(i-1,j+1),
+                
+                to_bounds(i,j-1),
+                cell,
+                to_bounds(i,j+1),
+                
+                to_bounds(i+1,j-1),
+                to_bounds(i+1,j),
+                to_bounds(i+1,j+1)
+            )
+        in
+        vect_mapi(f, line)
+    in
+    pipe2(1,(f1,f2),(vect_create(12,0)),(src,dst)) ;;
 
 let print_img(img) =
     let n = 12 in
@@ -235,7 +324,7 @@ let main(v:int<16>) =
         set(t1,10,[| 1;1;1;1;1;0;0;1;1;1;1;1 |]);
         set(t1,11,[| 1;1;1;1;1;1;1;1;1;1;1;1 |]);
         print_int c; print_newline ();
-        gradient_morph_seq(t1,t2);
+        gradient_morph_pipe(t1,t2);
         print_int c; print_newline ();
         print_img(t2)
     ) default () in res ;;

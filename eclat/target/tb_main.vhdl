@@ -1,10 +1,9 @@
 -- code generated from the following source code:
---   ../ocaml-vm/vm/target-specific/intel-max10/IOs.ecl
---   ../../adrien/stage/vhdl_externes/test.ecl
+--   ../../adrien/stage/vga/test.ecl
 --
 -- with the following command:
 --
---    ./eclat ../ocaml-vm/vm/target-specific/intel-max10/IOs.ecl ../../adrien/stage/vhdl_externes/test.ecl
+--    ./eclat ../../adrien/stage/vga/test.ecl
 
 
 library ieee;
